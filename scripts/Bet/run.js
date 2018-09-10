@@ -4,8 +4,6 @@ const Bet = contract(artifacts);
 Bet.setProvider(web3.currentProvider);
 Bet.defaults({gas: 1000000});
 
-console.log(web3);
-
 let betContract;
 
 let ownerAddress = "0x627306090abab3a6e1400e9345bc60c78a8bef57";
@@ -15,21 +13,23 @@ let voters = [
         address: "0xf17f52151ebef6c7334fad080c5704d77216b732",
         hashedVote: null,
         guess: 1,
-        bet: web3.utils.toWei(0.5, "ether")
+        bet: web3._extend.utils.toWei(0.5, "ether")
     },
     {
         address: "0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef",
         hashedVote: null,
         guess: 5,
-        bet: web3.utils.toWei(0.3, "ether")
+        bet: web3._extend.utils.toWei(0.3, "ether")
     },
     {
         address: "0x821aea9a577a9b44299b9c15c88cf3087f3b5544",
         hashedVote: null,
         guess: 10,
-        bet: web3.utils.toWei(1.0, "ether")
+        bet: web3._extend.utils.toWei(1.0, "ether")
     }
 ];
+
+console.log(voters);
 
 module.exports = function(callback) {
     Bet.deployed().then((contract) => {
@@ -115,7 +115,7 @@ function showBets() {
         (bets) => {
             console.log("---- BETS ----");
             for(let bet of bets) {
-                console.log(bet);
+                console.log(bet.toString());
             }
         }
     );
@@ -157,7 +157,7 @@ function castHashedVotes() {
  * @param {Object} voter 
  */
 function castHashedVote(voter) {
-    return betContract.castHashedVote(voter.hashedVote, {from: voter.address, gas: voter.bet});
+    return betContract.castHashedVote(voter.hashedVote, {from: voter.address, value: voter.bet});
 }
 
 /**

@@ -17,6 +17,8 @@ contract Bet {
     mapping(bytes32 => bool) private knownVotes;
     // The bet in ETH per voter.
     mapping(address => uint) private bets;
+    // Stores rewards for each player. It is up to the player to claim these rewards.
+    mapping(address => uint) private rewards;
     
     address[] private voters;
     
@@ -109,6 +111,7 @@ contract Bet {
             delete castHashedVotes[voter];
             delete castVotes[voter];
             delete knownVoters[voter];
+            delete bets[voter];
         }
         
         voters = new address[](0);
@@ -153,6 +156,46 @@ contract Bet {
                 winners.push(voter);
             }
         }
+
+        // Dispense rewards
+        uint[] memory bets_ = getBets();
+        uint totalBet = 0;
+        for(uint i = 0; i < bets_.length; i++) {
+            totalBet += bets_[i];
+        }
+
+        for(uint k = 0; k < winners.length; k++) {
+            address winner = winners[i];
+
+            uint bet = bets[winner];
+
+            uint betShare = bet + (bet / totalBet); // This does not work!
+
+            rewards[winner] += betShare;
+        }
+    }
+
+    // Returns the current answer. If the answer is still undetermined
+    // a value of -1 will be returned.
+    function getAnswer() public view returns(int answer_) {
+        return answer;
+    }
+
+    // Returns the current betting phase.
+    function getPhase() public view returns(BettingPhase phase_) {
+        return phase;
+    }
+
+    // Returns the current reward for the given player.
+    function getReward(address player) public view returns(uint reward) {
+        return rewards[player];
+    }
+
+    // Claims the reward for the given player. This will send the complete reward to the player.
+    function claimReward(address player) public {
+        uint reward = rewards[player];
+        rewards[player] = 0;
+        player.transfer(reward);
     }
 
     function getBets() public view returns(uint[] bets_) {

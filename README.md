@@ -31,3 +31,11 @@ exec ./scripts/Bet/run.js
 ```
 
 The test script will simulate three voters competing agains each other. 
+
+## Testing
+
+To run the unit tests do:
+
+```
+truffle test ./test/Bet.js
+```
